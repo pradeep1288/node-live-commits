@@ -12,6 +12,9 @@ var express = require('express')
 
 var app = express();
 var commit_msg = "";
+
+
+
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
@@ -32,18 +35,24 @@ app.get('/', routes.index);
 app.get('/users', user.list);
 app.get('/commits', function(req, res){
   commit_msg = req.query.q;
+  console.log(commit_msg);
+  everyone.now.distributeMessage(commit_msg);
   res.send(200);
 });
 
-var server = http.createServer(app)
+var server = http.createServer(app);
+var everyone = nowjs.initialize(server);
+
 server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
 
-var everyone = nowjs.initialize(server);
+everyone.now.distributeMessage = function(msg){
+    everyone.now.receiveMessage(msg);
+}
 
 
 nowjs.on('connect', function(){
     //Update the current set of users when someone joins
-    console.log("User joined...");
+    console.log("Client joined...");
 });
